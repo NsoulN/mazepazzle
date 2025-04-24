@@ -48,6 +48,7 @@ class CreatePazzle:
 
         self.draw_maze()
 
+        #プレイヤーの初期位置を設定
         self.player_x = 1
         self.player_y = 1
         self.player = self.canvas.create_rectangle(self.player_x*self.cellsize,
@@ -56,6 +57,7 @@ class CreatePazzle:
                                                     (self.player_y+1)*self.cellsize,
                                                     fill="red")
         
+        #ゴールの初期位置を設定
         self.gorl_x = 10
         self.gorl_y = 10
         self.gorl = self.canvas.create_rectangle(self.gorl_x*self.cellsize,
@@ -64,8 +66,10 @@ class CreatePazzle:
                                                     (self.gorl_y+1)*self.cellsize,
                                                     fill="green")
         
+        #パネルの位置と種類を保持する辞書型のpannelsを初期化
         self.pannels = {}
 
+    #迷路を描画する関数
     def draw_maze(self):
         for row in range(len(self.maze)):
             for col in range(len(self.maze[0])):
@@ -90,6 +94,7 @@ class CreatePazzle:
                 self.root.bind("<KeyPress-5>",self.gorl)
                 self.root.bind("<KeyPress-p>",self.start)
 
+    #クリックされたときの処理
     def on_cell_click(self, event):
         # クリックされた位置を取得
         x = event.x
@@ -111,14 +116,14 @@ class CreatePazzle:
             self.maze[row][col] = 0
             self.canvas.itemconfig(f"cell_{row}_{col}", fill="white")  # 通路に変更
         elif self.click_state == "red":#プレイヤーの初期位置を設定
-            if (col,row) in self.pannels:
+            if (col,row) in self.pannels:#クリックした位置にパネルがあった場合削除
                 del self.pannels[(col,row)]
-            if self.maze[row][col] == 0:
+            if self.maze[row][col] == 0:#クリックした場所が通路の場合のみプレイヤーの位置を設定
                 self.click_state = "white"
                 self.player_x = col
                 self.player_y = row
                 self.update_player_locate()
-        elif self.click_state == "green":
+        elif self.click_state == "green":#ゴールの位置を設定
             if (col,row) in self.pannels:
                 del self.pannels[(col,row)]
             if self.maze[row][col] == 0:
@@ -136,28 +141,28 @@ class CreatePazzle:
             self.pannels[(col,row)] = p.key_Pannel(col,row)
             self.canvas.itemconfig(f"cell_{row}_{col}", fill="yellow")  # キーパネルに変更
 
-    def update_player_locate(self):
+    def update_player_locate(self):#プレイヤーの位置を更新する関数
         self.canvas.coords(self.player,
                             self.player_x*self.cellsize,
                             self.player_y*self.cellsize,
                             (self.player_x+1)*self.cellsize,
                             (self.player_y+1)*self.cellsize)
         
-    def update_gorl_locate(self):
+    def update_gorl_locate(self):#ゴールの位置を更新する関数
         self.canvas.coords(self.gorl,
                             self.gorl_x*self.cellsize,
                             self.gorl_y*self.cellsize,
                             (self.gorl_x+1)*self.cellsize,
                             (self.gorl_y+1)*self.cellsize)
 
-    def define(self):
+    def define(self):#defineボタンがクリックされたときの動作
         data = {"maze":self.maze,"player":(self.player_x,self.player_y),"gorl":(self.gorl_x,self.gorl_y),"pannels":self.pannels}
         print(data)
         self.root.destroy()
         new_pazzle.start(data)
 
 
-    def set_game_description(self):
+    def set_game_description(self):#ゲームの説明文を配置する関数
         """ゲームの説明文を初期設定する"""
         description = """
         **説明**
@@ -176,6 +181,7 @@ class CreatePazzle:
         """
         self.description_text.set(description)
     
+    #押されたキーに対する動作
     def road(self,event):
         self.click_state = "white"
     
@@ -197,7 +203,7 @@ class CreatePazzle:
     def filter_pannel(self,event):
         self.click_state = "orange"
 
-
-root = tk.Tk()
-CreatePazzle(root)
-root.mainloop()
+if __name__ == "__main__":#このファイルが実行されたときのみ以下の動作が実行される
+    root = tk.Tk()
+    CreatePazzle(root)
+    root.mainloop()
